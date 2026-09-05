@@ -2,23 +2,20 @@ class Solution {
 public:
     int firstStableIndex(vector<int>& nums, int k) {
         int n = nums.size();
+        if (n == 0) return -1;
 
+        // Compute suffix minimums
+        vector<int> suffixMin(n);
+        suffixMin[n - 1] = nums[n - 1];
+        for (int i = n - 2; i >= 0; i--) {
+            suffixMin[i] = min(nums[i], suffixMin[i + 1]);
+        }
+
+        // Track prefix maximum and check stability
+        int prefixMax = INT_MIN;
         for (int i = 0; i < n; i++) {
-            int maxLeft = INT_MIN;
-
-            // Find maximum from 0 to i
-            for (int j = 0; j <= i; j++) {
-                maxLeft = max(maxLeft, nums[j]);
-            }
-
-            int minRight = INT_MAX;
-
-            // Find minimum from i to n-1
-            for (int j = i; j < n; j++) {
-                minRight = min(minRight, nums[j]);
-            }
-
-            int instability = maxLeft - minRight;
+            prefixMax = max(prefixMax, nums[i]);
+            int instability = prefixMax - suffixMin[i];
 
             if (instability <= k) {
                 return i;
